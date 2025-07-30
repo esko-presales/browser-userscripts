@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cmd/Ctrl+Click: WebCenter Quick Actions
 // @namespace    http://tampermonkey.net/
-// @version      1.10
+// @version      1.20
 // @description  Cmd+Click (Mac) or Ctrl+Click (Win) elements for WebCenter actions. Case 3 opens all overrideWorkflows; Case 4 opens only the first.
 // @author       David Cebula (DACE)
 // @match        *://*/*
