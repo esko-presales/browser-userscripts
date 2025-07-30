@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Glass Slide-In Center Panel with Dynamic Links and Optional Sound
 // @namespace    http://tampermonkey.net/
-// @version      3.2
+// @version      3.25
 // @description  Slide-in glassy panel into center on WebCenter when holding Option; hides after click and optional sound
 // @match        https://*.esko-saas.com/WebCenter/*
 // @author       David Cebula (DACE)
@@ -14,6 +14,9 @@
 
 (function () {
 
+    // MFUR - 30-July-2025
+    // Prompt user to decide on sound setting
+    // Sadly, I cannot think of a way to let them hear the sound first before making the decision. :/
     let soundSetting = GM_getValue("heyoooSetting", null);
 
     if (soundSetting === null) {
