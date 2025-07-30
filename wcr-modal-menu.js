@@ -1,19 +1,31 @@
 // ==UserScript==
 // @name         Glass Slide-In Center Panel with Dynamic Links and Optional Sound
 // @namespace    http://tampermonkey.net/
-// @version      3.0
+// @version      3.1
 // @description  Slide-in glassy panel into center on WebCenter when holding Option; hides after click and optional sound
 // @match        https://*.esko-saas.com/WebCenter/*
-// @grant        none
+// @author       David Cebula (DACE)
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @run-at       document-end
 // @downloadURL  https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-modal-menu.js
 // @updateURL    https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-modal-menu.js
 // ==/UserScript==
 
-(function() {
-    const SOUND_ENABLED = true;
+(function () {
+
+    let soundSetting = GM_getValue("heyoooSetting", null);
+
+    if (soundSetting === null) {
+        const result = confirm("Enable heyoo sound? Click OK for True, Cancel for False.");
+        GM_setValue("heyoooSetting", result);
+        soundSetting = result;
+    }
+
+    console.log("Boolean setting is:", soundSetting);
+
     let heyoAudio = null;
-    if (SOUND_ENABLED) {
+    if (soundSetting) {
         heyoAudio = new Audio('https://www.myinstants.com/media/sounds/heyooo_Aim6Y0j.mp3');
         heyoAudio.preload = 'auto';
     }
@@ -23,9 +35,9 @@
     const baseUrl = (idx !== -1) ? fullUrl.slice(0, idx + 11) : window.location.origin + '/WebCenter/';
 
     const columns = [
-        [ { label: 'Preferences', page: 'sitedefaults.jsp' }, { label: 'Menus', page: 'menus.jsp' }, { label: 'Dashboards', page: 'dashboards.jsp' }, { label: 'Task Lists', page: 'mytasktypes.jsp' } ],
-        [ { label: 'Searches', page: 'mysavedsearches.jsp' }, { label: 'Projects', page: 'projsearch.jsp' }, { label: 'Documents', page: 'alldocsearch.jsp' }, { label: 'Tasks', page: 'wctasksearch.jsp' } ],
-        [ { label: 'Favourites', page: 'myfavoriteproj.jsp' }, { label: 'Projects', page: 'myallprojects.jsp' }, { label: 'Categories', page: 'attcategorymgr.jsp' }, { label: 'Lists', page: 'lists.jsp' } ]
+        [{ label: 'Preferences', page: 'sitedefaults.jsp' }, { label: 'Menus', page: 'menus.jsp' }, { label: 'Dashboards', page: 'dashboards.jsp' }, { label: 'Task Lists', page: 'mytasktypes.jsp' }],
+        [{ label: 'Searches', page: 'mysavedsearches.jsp' }, { label: 'Projects', page: 'projsearch.jsp' }, { label: 'Documents', page: 'alldocsearch.jsp' }, { label: 'Tasks', page: 'wctasksearch.jsp' }],
+        [{ label: 'Favourites', page: 'myfavoriteproj.jsp' }, { label: 'Projects', page: 'myallprojects.jsp' }, { label: 'Categories', page: 'attcategorymgr.jsp' }, { label: 'Lists', page: 'lists.jsp' }]
     ];
 
     const panel = document.createElement('div');

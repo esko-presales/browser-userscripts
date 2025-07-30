@@ -13,7 +13,7 @@ These scripts are provided for internal use within Esko. You are free to use, mo
    - **Edge**: [Microsoft Store](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)
 
 ### Step 2: Install Scripts
-For each script you want to use, click on the appropriate link below. Tampermonkey will automatically detect the script and prompt you to install it.
+For each script you want to use, click on the appropriate link below. Tampermonkey **might** automatically detect the script and prompt you to install it.
 
 #### Available Scripts:
 
@@ -50,4 +50,3 @@ If you make improvements or find bugs, please:
 2. Make your changes
 3. Submit a pull request
 4. Or contact the original author with your suggestions
-
