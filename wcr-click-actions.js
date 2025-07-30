@@ -3,8 +3,10 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.10
 // @description  Cmd+Click (Mac) or Ctrl+Click (Win) elements for WebCenter actions. Case 3 opens all overrideWorkflows; Case 4 opens only the first.
+// @author       David Cebula (DACE)
 // @match        *://*/*
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @downloadURL  https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-click-actions.js
 // @updateURL    https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-click-actions.js
 // ==/UserScript==
@@ -12,10 +14,26 @@
 (function() {
     'use strict';
 
+
+    // MFUR - 30-July-2025
+    // Prompt user to set Esko initials if not already set
+    let userInitials = GM_getValue("eskoInitials", null);
+    if (!userInitials) {
+        userInitials = prompt("Please enter your initials:");
+        if (userInitials) {
+            GM_setValue("eskoInitials", userInitials);
+        } else {
+            userInitials = "N/A"; // fallback
+        }
+    }
+
+    console.log("User initials:", userInitials);
+
+    // Check if the platform is Mac
     var isMac = /Mac/.test(navigator.platform);
 
     // workflows declared here; Case 3 will open each, Case 4 uses only the first
-    var overrideWorkflows = ['DACE-TEST', 'OTHER-TEST'];
+    var overrideWorkflows = [userInitials + '-TEST', 'OTHER-TEST'];
 
     document.addEventListener('click', function(e) {
         // left-click + ⌘ on Mac or Ctrl on Windows
