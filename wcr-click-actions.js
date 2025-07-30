@@ -14,7 +14,6 @@
 (function() {
     'use strict';
 
-
     // MFUR - 30-July-2025
     // Prompt user to set Esko initials if not already set
     let userInitials = GM_getValue("eskoInitials", null);

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Glass Slide-In Center Panel with Dynamic Links and Optional Sound
 // @namespace    http://tampermonkey.net/
-// @version      3.1
+// @version      3.2
 // @description  Slide-in glassy panel into center on WebCenter when holding Option; hides after click and optional sound
 // @match        https://*.esko-saas.com/WebCenter/*
 // @author       David Cebula (DACE)
@@ -110,7 +110,7 @@
         if (event.key === 'Alt' && !optTimer) {
             optTimer = setTimeout(() => {
                 panel.style.left = '33%';
-                if (SOUND_ENABLED && heyoAudio) {
+                if (soundSetting && heyoAudio) {
                     heyoAudio.currentTime = 0;
                     heyoAudio.play();
                 }
