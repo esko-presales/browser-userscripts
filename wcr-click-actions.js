@@ -7,8 +7,8 @@
 // @match        *://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @downloadURL  https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-click-actions.js
-// @updateURL    https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-click-actions.js
+// @downloadURL  https://raw.githubusercontent.com/esko-presales/browser-userscripts/refs/heads/main/wcr-click-actions.js
+// @updateURL    https://raw.githubusercontent.com/esko-presales/browser-userscripts/refs/heads/main/wcr-click-actions.js
 // ==/UserScript==
 
 (function() {

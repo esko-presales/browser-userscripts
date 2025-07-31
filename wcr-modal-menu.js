@@ -8,8 +8,8 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @run-at       document-end
-// @downloadURL  https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-modal-menu.js
-// @updateURL    https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-modal-menu.js
+// @downloadURL  https://raw.githubusercontent.com/esko-presales/browser-userscripts/refs/heads/main/wcr-modal-menu.js
+// @updateURL    https://raw.githubusercontent.com/esko-presales/browser-userscripts/refs/heads/main/wcr-modal-menu.js
 // ==/UserScript==
 
 (function () {
