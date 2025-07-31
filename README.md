@@ -5,20 +5,29 @@ These scripts are provided for internal use within Esko. You are free to use, mo
 
 ## Installation Instructions
 
-### Step 1: Install Tampermonkey
-1. Install the Tampermonkey browser extension:
+### Step 1: Install Violentmonkey (MIT Licensed) or Tampermonkey (Closed Source)
+
+1. Install the extension of your choice
+
+Option 1: Install the Violentmonkey browser extension:
+   - **Chrome**: [Chrome Web Store](https://chrome.google.com/webstore/detail/violent-monkey/jinjaccalgkegednnccohejagnlnfdag)
+   - **Firefox**: [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
+   - **Safari**: [Safari Extensions](https://apps.apple.com/us/app/)
+   - **Edge**: [Microsoft Store](https://microsoftedge.microsoft.com/addons/detail/violentmonkey/eeagobfjdenkkddmbclomhiblgggliao?hl=en-US)
+
+Option 2: Install the Tampermonkey browser extension:
    - **Chrome**: [Chrome Web Store](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
    - **Firefox**: [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/)
    - **Safari**: [Safari Extensions](https://apps.apple.com/us/app/tampermonkey/id1482490089)
    - **Edge**: [Microsoft Store](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)
 
 ### Step 2: Install Scripts
-For each script you want to use, click on the appropriate link below. Tampermonkey **might** automatically detect the script and prompt you to install it.
+For each script you want to use, click on the appropriate link below. The extension **might** automatically detect the script and prompt you to install it.
 
 #### Available Scripts:
 
 **WebCenter Quick Actions Script:**
-- **Install Link**: [wcr-click-actions.js](https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-click-actions.js)
+- **Install Link**: [wcr-click-actions.js](https://raw.githubusercontent.com/esko-presales/browser-userscripts/refs/heads/main/wcr-click-actions.js)
 - **Description**: Cmd+Click (Mac) or Ctrl+Click (Win) elements for WebCenter actions
 - **Features**:
   - Open attribute categories for editing
@@ -28,7 +37,7 @@ For each script you want to use, click on the appropriate link below. Tampermonk
   - Open task type specifications
 
 **WebCenter Modal Menu Script:**
-- **Install Link**: [wcr-modal-menu.js](https://raw.githubusercontent.com/esko-presales/tampermonkey-scripts/refs/heads/main/wcr-modal-menu.js)
+- **Install Link**: [wcr-modal-menu.js](https://raw.githubusercontent.com/esko-presales/browser-userscripts/refs/heads/main/wcr-modal-menu.js)
 - **Description**: Adds modal menu functionality to WebCenter
 
 ### Step 3: Configure Scripts
