@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cmd/Ctrl+Click: WebCenter Quick Actions
 // @namespace    http://tampermonkey.net/
-// @version      1.20
+// @version      1.3
 // @description  Cmd+Click (Mac) or Ctrl+Click (Win) elements for WebCenter actions. Case 3 opens all overrideWorkflows; Case 4 opens only the first.
 // @author       David Cebula (DACE)
 // @match        *://*/*
@@ -11,7 +11,7 @@
 // @updateURL    https://raw.githubusercontent.com/esko-presales/browser-userscripts/refs/heads/main/wcr-click-actions.js
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
     // MFUR - 30-July-2025
@@ -29,166 +29,138 @@
     console.log("User initials:", userInitials);
 
     // Check if the platform is Mac
-    var isMac = /Mac/.test(navigator.platform);
+    const isMac = /Mac/.test(navigator.platform);
 
-    // workflows declared here; Case 3 will open each, Case 4 uses only the first
-    var overrideWorkflows = [userInitials + '-TEST', 'OTHER-TEST'];
+    // overrideWorkflows: configure your workflow names here. Leave empty to disable case3/4.
+    const overrideWorkflows = [userInitials + '-TEST', 'OTHER-TEST'];
 
     document.addEventListener('click', function(e) {
-        // left-click + ⌘ on Mac or Ctrl on Windows
+        // only proceed on left-click + Cmd/Ctrl
         if (e.button !== 0) return;
-        if (isMac ? !e.metaKey : !e.ctrlKey) return;
-        e.preventDefault();
-        e.stopPropagation();
+        if (!(isMac ? e.metaKey : e.ctrlKey)) return;
 
-        var el = e.target;
-        var className = typeof el.className === 'string' ? el.className.trim() : '';
-        var value = (el.value || el.alt || el.title || el.innerText || el.textContent || '').trim();
-        var URLCtor = window.URL;
+        const el = e.target;
+        const className = typeof el.className === 'string' ? el.className.trim() : '';
+        const value = (el.value || el.alt || el.title || el.innerText || el.textContent || '').trim();
+        const URLCtor = window.URL;
 
-        // projectID and basePath
-        var href = window.location.href;
-        var projectId = '';
+        // common helpers
+        let href = window.location.href;
+        let projectId = '';
         try {
             projectId = new URLCtor(href).searchParams.get('projectID') || '';
         } catch (_) {}
-        var basePath = href.substring(0, href.lastIndexOf('/') + 1);
-        var tasksURL = basePath +
-            'projdetailswctasks.jsp?projectID=' + encodeURIComponent(projectId) +
-            '&folderID=&menu_file=myallprojects';
+        const basePath = href.substring(0, href.lastIndexOf('/') + 1);
+        const tasksURL = basePath + 'projdetailswctasks.jsp?projectID=' + encodeURIComponent(projectId) + '&folderID=&menu_file=myallprojects';
 
-        // build workflows array
-        var workflows = Array.isArray(overrideWorkflows) && overrideWorkflows.length
-            ? overrideWorkflows.slice()
-            : ['TEST'];
-
-        // Case 1: attribute-category-name (unchanged)
+        // CASE 1: attribute-category-name
         if (el.classList.contains('attribute-category-name')) {
-            var selCat = value.toUpperCase();
+            e.preventDefault(); e.stopPropagation();
+            const selCat = value.toUpperCase();
             if (!selCat) { alert('Please select a category'); return; }
             fetch('GetAttributeCategoryList.jsp?verbose=0&ajax=1')
                 .then(r => r.text())
                 .then(txt => new DOMParser().parseFromString(txt, 'text/xml'))
                 .then(xml => {
-                    var cats = xml.getElementsByTagName('category'), found = false;
-                    for (var i = 0; i < cats.length; i++) {
-                        var node = cats[i],
-                            id = node.getAttribute('id'),
-                            nmNode = node.getElementsByTagName('name')[0],
-                            nm = nmNode ? nmNode.textContent.trim().toUpperCase() : '';
+                    const cats = xml.getElementsByTagName('category');
+                    for (let node of cats) {
+                        const id = node.getAttribute('id');
+                        const nm = node.getElementsByTagName('name')[0]?.textContent.trim().toUpperCase() || '';
                         if (nm === selCat) {
-                            found = true;
-                            var w = window.open('attcategorymgredit.jsp?categoryID=' + id, '_blank');
+                            const w = window.open(`attcategorymgredit.jsp?categoryID=${id}`, '_blank');
                             if (w) w.focus();
-                            break;
+                            return;
                         }
                     }
-                    if (!found) alert("Could not find attribute category '" + selCat + "'");
+                    alert(`Could not find attribute category '${selCat}'`);
                 });
             return;
         }
 
-        // Case 2: projdetails.jsp skipDashboard (unchanged)
-        if (!className && el.tagName === 'A' && el.href.indexOf('projdetails.jsp') !== -1) {
+        // CASE 2: projdetails.jsp skipDashboard
+        if (!className && el.tagName === 'A' && el.href.includes('projdetails.jsp')) {
             try {
-                var u2 = new URLCtor(el.href);
+                const u2 = new URLCtor(el.href);
                 if (u2.searchParams.has('menu_file')) {
+                    e.preventDefault(); e.stopPropagation();
                     u2.searchParams.set('skipDashboard', '1');
-                    var w2 = window.open(u2.toString(), '_blank');
+                    const w2 = window.open(u2.toString(), '_blank');
                     if (w2) w2.focus();
                     return;
                 }
             } catch (_) {}
         }
 
-        // Case 3: td-label + "Manager:" → open ALL workflows
-        if (el.classList.contains('td-label') && value.startsWith('Manager:')) {
+        // If no workflows defined, skip case3 & case4
+        const workflows = Array.isArray(overrideWorkflows) ? overrideWorkflows.slice() : [];
+
+        // CASE 3: Manager -> open ALL workflows
+        if (workflows.length > 0 && el.classList.contains('td-label') && value.startsWith('Manager:')) {
+            e.preventDefault(); e.stopPropagation();
             fetch('GetTaskTypes.jsp?verbose=0&ajax=1')
                 .then(r => r.text())
                 .then(txt => new DOMParser().parseFromString(txt, 'text/xml'))
                 .then(xml => {
-                    var types = Array.from(xml.getElementsByTagName('wctask_type'));
-                    var notFound = [];
-                    workflows.forEach(function(wf) {
-                        var match = wf.toUpperCase();
-                        var foundThis = false;
-                        for (var i = 0; i < types.length; i++) {
-                            var node = types[i],
-                                id = node.getAttribute('id'),
-                                tn = node.getElementsByTagName('task_type_name')[0],
-                                nm = tn ? tn.textContent.trim().toUpperCase() : '';
-                            if (nm === match) {
-                                foundThis = true;
-                                var w3 = window.open(
-                                    'wctasktypedetailsworkflow.jsp?taskTypeID=' + id + '&menu_file=mytasktypes',
-                                    '_blank'
-                                );
-                                if (w3) w3.focus();
-                                break;
-                            }
+                    const types = Array.from(xml.getElementsByTagName('wctask_type'));
+                    const notFound = [];
+                    workflows.forEach(wf => {
+                        const match = wf.toUpperCase();
+                        const node = types.find(t => t.getElementsByTagName('task_type_name')[0]?.textContent.trim().toUpperCase() === match);
+                        if (node) {
+                            const id = node.getAttribute('id');
+                            const w3 = window.open(`wctasktypedetailsworkflow.jsp?taskTypeID=${id}&menu_file=mytasktypes`, '_blank');
+                            if (w3) w3.focus();
+                        } else {
+                            notFound.push(wf);
                         }
-                        if (!foundThis) notFound.push(wf);
                     });
-                    if (notFound.length) {
-                        alert("Could not find workflow(s): " + notFound.join(', '));
-                    }
+                    if (notFound.length) alert(`Could not find workflow(s): ${notFound.join(', ')}`);
                 });
             return;
         }
 
-        // Case 4: td-label + "Customer:" → create only first workflow, then redirect
-        if (el.classList.contains('td-label') && value.startsWith('Customer:')) {
+        // CASE 4: Customer -> open first workflow and redirect
+        if (workflows.length > 0 && el.classList.contains('td-label') && value.startsWith('Customer:')) {
             if (!projectId) { console.error('projectID not found'); return; }
-            var wfName = workflows[0];
-            var params = {
+            e.preventDefault(); e.stopPropagation();
+            const wfName = workflows[0];
+            const params = {
                 projectid: projectId,
                 tasktypename: wfName,
                 starttaskoption: '2',
                 duedate: '275742489000'
             };
-            var qs = new URLSearchParams(Object.entries(params)).toString();
-            var actionUrl = basePath + 'CreateProjectTask.jsp?' + qs;
-
-            fetch(actionUrl)
-                .then(function(response) {
-                    if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
-                })
-                .then(function() {
+            const qs = new URLSearchParams(params).toString();
+            fetch(`${basePath}CreateProjectTask.jsp?${qs}`)
+                .then(res => { if (!res.ok) throw new Error(`${res.status} ${res.statusText}`); })
+                .then(() => {
                     window.location.href = tasksURL;
                 })
-                .catch(function(err) {
-                    alert('Error creating task: ' + err);
-                });
+                .catch(err => alert('Error creating task: ' + err));
             return;
         }
 
-        // Case 5: read-only-string col-sm-12 col-lg-9 (unchanged)
-        var parts = className.split(/\s+/);
+        // CASE 5: read-only-string specification details
+        const parts = className.split(/\s+/);
         if (parts.includes('read-only-string') && parts.includes('col-sm-12') && parts.includes('col-lg-9')) {
-            var sel5 = value.toUpperCase();
+            e.preventDefault(); e.stopPropagation();
+            const sel5 = value.toUpperCase();
             if (!sel5) { alert('Please select a task type'); return; }
             fetch('GetTaskTypes.jsp?verbose=0&ajax=1')
                 .then(r => r.text())
                 .then(txt => new DOMParser().parseFromString(txt, 'text/xml'))
                 .then(xml => {
-                    var types = xml.getElementsByTagName('wctask_type'), found = false;
-                    for (var i = 0; i < types.length; i++) {
-                        var node = types[i],
-                            id = node.getAttribute('id'),
-                            tn = node.getElementsByTagName('task_type_name')[0],
-                            nm = tn ? tn.textContent.trim().toUpperCase() : '';
+                    const types = xml.getElementsByTagName('wctask_type');
+                    for (let node of types) {
+                        const nm = node.getElementsByTagName('task_type_name')[0]?.textContent.trim().toUpperCase() || '';
                         if (nm === sel5) {
-                            found = true;
-                            var w5 = window.open(
-                                'wctasktypedetailsspecifications.jsp?taskTypeID=' + id +
-                                '&menu_file=wctasktypedetailsworkflow',
-                                '_blank'
-                            );
+                            const id = node.getAttribute('id');
+                            const w5 = window.open(`wctasktypedetailsspecifications.jsp?taskTypeID=${id}&menu_file=wctasktypedetailsworkflow`, '_blank');
                             if (w5) w5.focus();
-                            break;
+                            return;
                         }
                     }
-                    if (!found) alert("Could not find tasktype '" + sel5 + "'");
+                    alert(`Could not find tasktype '${sel5}'`);
                 });
             return;
         }
